@@ -10,22 +10,19 @@ class BitgetFutures:
         if api_setup is None:
             api_setup = {}
 
-        # ✅ Initialize session with enforced testnet & swap settings
         self.session = ccxt.bitget({
             "apiKey": api_setup.get("apiKey"),
             "secret": api_setup.get("secret"),
             "password": api_setup.get("password"),
             "enableRateLimit": True,
             "options": {
-                "defaultType": "swap",  # ✅ Must be set BEFORE load_markets()
+                "defaultType": "swap",
                 "test": True
             }
         })
 
         print("✅ CCXT Bitget configured for DEMO environment.")
         print(f"🔗 API Type: {self.session.options.get('defaultType')}")
-
-        # ✅ Load swap markets
         self.markets = self.session.load_markets()
         print("🔍 Available symbols (first 10):", list(self.markets.keys())[:10])
 
@@ -48,19 +45,19 @@ class BitgetFutures:
         return self.session.fetch_order(id, symbol)
 
     def fetch_open_orders(self, symbol: str) -> List[Dict[str, Any]]:
-        return self.session.fetch_open_orders(symbol, type='swap', params={"productType": "SUSDT-FUTURES"})
+        return self.session.fetch_open_orders(symbol, params={"productType": "SUSDT-FUTURES"})
 
     def fetch_open_trigger_orders(self, symbol: str) -> List[Dict[str, Any]]:
-        return self.session.fetch_open_orders(symbol, type='swap', params={'stop': True})
+        return self.session.fetch_open_orders(symbol, params={"stop": True})
 
     def fetch_closed_trigger_orders(self, symbol: str) -> List[Dict[str, Any]]:
-        return self.session.fetch_closed_orders(symbol, type='swap', params={'stop': True})
+        return self.session.fetch_closed_orders(symbol, params={"stop": True})
 
     def cancel_order(self, id: str, symbol: str) -> Dict[str, Any]:
         return self.session.cancel_order(id, symbol)
 
     def cancel_trigger_order(self, id: str, symbol: str) -> Dict[str, Any]:
-        return self.session.cancel_order(id, symbol, params={'stop': True})
+        return self.session.cancel_order(id, symbol, params={"stop": True})
 
     def fetch_open_positions(self, symbol: str) -> List[Dict[str, Any]]:
         positions = self.session.fetch_positions([symbol], params={
