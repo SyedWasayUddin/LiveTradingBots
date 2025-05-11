@@ -16,17 +16,20 @@ class BitgetFutures:
             "password": api_setup.get("password"),
             "enableRateLimit": True,
             "options": {
-                "defaultType": "swap",  # Required for futures/swap
+                "defaultType": "swap",  # Required for futures
                 "test": True
             }
         })
 
+        # ✅ Ensure CCXT routes to Bitget's sandbox environment
         self.session.set_sandbox_mode(True)
+        self.session.urls['api']['rest'] = 'https://api-demo.bitget.com'  # 🔥 This is the key fix
 
         print("✅ CCXT Bitget configured for DEMO environment.")
         print(f"🔗 API Type: {self.session.options.get('defaultType')}")
         self.markets = self.session.load_markets()
         print("🔍 Available symbols (first 10):", list(self.markets.keys())[:10])
+
 
     def fetch_ticker(self, symbol: str) -> Dict[str, Any]:
         return self.session.fetch_ticker(symbol)
@@ -48,8 +51,11 @@ class BitgetFutures:
         return self.session.fetch_order(id, market['id'])
 
     def fetch_open_orders(self, symbol: str) -> List[Dict[str, Any]]:
-        market = self.session.market(symbol)
-        return self.session.fetch_open_orders(market['id'])
+        # Hardcoded valid demo market symbol ID
+        return self.session.private_mix_get_v2_mix_order_orders_pending({
+            'symbol': 'SBTCSUSDT_UMCBL',  # ✅ Bitget demo symbol ID
+            'productType': 'umcbl'        # ✅ Required for demo swap markets
+        })
 
     def fetch_open_trigger_orders(self, symbol: str) -> List[Dict[str, Any]]:
         market = self.session.market(symbol)
