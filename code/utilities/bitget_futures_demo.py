@@ -17,26 +17,11 @@ class BitgetFutures:
             "enableRateLimit": True,
             "options": {
                 "defaultType": "swap",  # Required for futures
-                "test": True
+                "headers": {
+                    "PAPTRADING": "1"   # ✅ Tells Bitget to use demo environment
+                }
             }
         })
-
-        # Manually override API base URL to point to the demo environment
-        self.session.urls['api'] = {
-            'spot': 'https://api-demo.bitget.com',
-            'mix': 'https://api-demo.bitget.com',
-            'broker': 'https://api-demo.bitget.com',
-            'user': 'https://api-demo.bitget.com',
-            'copytrading': 'https://api-demo.bitget.com',
-            'common': 'https://api-demo.bitget.com',
-            'public': 'https://api-demo.bitget.com',
-            'private': 'https://api-demo.bitget.com',
-        }
-
-
-        # ✅ Ensure CCXT routes to Bitget's sandbox environment
-        self.session.set_sandbox_mode(True)
-        self.session.urls['api']['rest'] = 'https://api-demo.bitget.com'  # 🔥 This is the key fix
 
         print("✅ CCXT Bitget configured for DEMO environment.")
         print(f"🔗 API Type: {self.session.options.get('defaultType')}")
