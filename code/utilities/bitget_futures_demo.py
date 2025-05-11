@@ -26,7 +26,8 @@ class BitgetFutures:
         print("✅ CCXT Bitget configured for DEMO environment.")
         print(f"🔗 API Type: {self.session.options.get('defaultType')}")
         self.markets = self.session.load_markets()
-        print("🔍 Available symbols (first 10):", list(self.markets.keys())[:10])
+        print("✅ All market symbols:", list(self.markets.keys()))
+        
 
 
     def fetch_ticker(self, symbol: str) -> Dict[str, Any]:
