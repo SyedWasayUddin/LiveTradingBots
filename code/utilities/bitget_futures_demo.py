@@ -16,12 +16,12 @@ class BitgetFutures:
             "password": api_setup.get("password"),
             "enableRateLimit": True,
             "options": {
-                "defaultType": "swap",  # ✅ Important
+                "defaultType": "swap",  # Required for futures/swap
                 "test": True
             }
         })
 
-        self.session.set_sandbox_mode(True)  # ✅ Required for demo environment
+        self.session.set_sandbox_mode(True)
 
         print("✅ CCXT Bitget configured for DEMO environment.")
         print(f"🔗 API Type: {self.session.options.get('defaultType')}")
@@ -44,41 +44,49 @@ class BitgetFutures:
         return self.session.fetch_balance(params or {})
 
     def fetch_order(self, id: str, symbol: str) -> Dict[str, Any]:
-        return self.session.fetch_order(id, symbol)
+        market = self.session.market(symbol)
+        return self.session.fetch_order(id, market['id'])
 
     def fetch_open_orders(self, symbol: str) -> List[Dict[str, Any]]:
-        return self.session.fetch_open_orders(symbol)
+        market = self.session.market(symbol)
+        return self.session.fetch_open_orders(market['id'])
 
     def fetch_open_trigger_orders(self, symbol: str) -> List[Dict[str, Any]]:
-        return self.session.fetch_open_orders(symbol, params={"stop": True})
+        market = self.session.market(symbol)
+        return self.session.fetch_open_orders(market['id'], params={"stop": True})
 
     def fetch_closed_trigger_orders(self, symbol: str) -> List[Dict[str, Any]]:
-        return self.session.fetch_closed_orders(symbol, params={"stop": True})
+        market = self.session.market(symbol)
+        return self.session.fetch_closed_orders(market['id'], params={"stop": True})
 
     def cancel_order(self, id: str, symbol: str) -> Dict[str, Any]:
-        return self.session.cancel_order(id, symbol)
+        market = self.session.market(symbol)
+        return self.session.cancel_order(id, market['id'])
 
     def cancel_trigger_order(self, id: str, symbol: str) -> Dict[str, Any]:
-        return self.session.cancel_order(id, symbol, params={"stop": True})
+        market = self.session.market(symbol)
+        return self.session.cancel_order(id, market['id'], params={"stop": True})
 
     def fetch_open_positions(self, symbol: str) -> List[Dict[str, Any]]:
-        positions = self.session.fetch_positions([symbol])
+        market = self.session.market(symbol)
+        positions = self.session.fetch_positions([market['id']])
         return [pos for pos in positions if float(pos.get('contracts', 0)) > 0]
 
     def flash_close_position(self, symbol: str, side: Optional[str] = None) -> Dict[str, Any]:
-        return self.session.close_position(symbol, side=side)
+        market = self.session.market(symbol)
+        return self.session.close_position(market['id'], side=side)
 
     def set_margin_mode(self, symbol: str, margin_mode: str = 'isolated') -> None:
-        self.session.set_margin_mode(margin_mode, symbol)
+        market = self.session.market(symbol)
+        self.session.set_margin_mode(margin_mode, market['id'])
 
     def set_leverage(self, symbol: str, margin_mode: str = 'isolated', leverage: int = 1) -> None:
+        market = self.session.market(symbol)
         if margin_mode == 'isolated':
             for side in ['long', 'short']:
-                self.session.set_leverage(leverage, symbol, params={
-                    'holdSide': side,
-                })
+                self.session.set_leverage(leverage, market['id'], params={'holdSide': side})
         else:
-            self.session.set_leverage(leverage, symbol)
+            self.session.set_leverage(leverage, market['id'])
 
     def fetch_recent_ohlcv(self, symbol: str, timeframe: str, limit: int = 1000) -> pd.DataFrame:
         bitget_fetch_limit = 200
@@ -109,33 +117,37 @@ class BitgetFutures:
         return df
 
     def place_market_order(self, symbol: str, side: str, amount: float, reduce: bool = False) -> Dict[str, Any]:
+        market = self.session.market(symbol)
         params = {'reduceOnly': reduce}
         amount = self.amount_to_precision(symbol, amount)
-        return self.session.create_order(symbol, 'market', side, amount, params=params)
+        return self.session.create_order(market['id'], 'market', side, amount, params=params)
 
     def place_limit_order(self, symbol: str, side: str, amount: float, price: float, reduce: bool = False) -> Dict[str, Any]:
+        market = self.session.market(symbol)
         params = {'reduceOnly': reduce}
         amount = self.amount_to_precision(symbol, amount)
         price = self.price_to_precision(symbol, price)
-        return self.session.create_order(symbol, 'limit', side, amount, price, params=params)
+        return self.session.create_order(market['id'], 'limit', side, amount, price, params=params)
 
     def place_trigger_market_order(self, symbol: str, side: str, amount: float, trigger_price: float, reduce: bool = False) -> Optional[Dict[str, Any]]:
         try:
+            market = self.session.market(symbol)
             amount = self.amount_to_precision(symbol, amount)
             trigger_price = self.price_to_precision(symbol, trigger_price)
             params = {'reduceOnly': reduce, 'triggerPrice': trigger_price}
-            return self.session.create_order(symbol, 'market', side, amount, params=params)
+            return self.session.create_order(market['id'], 'market', side, amount, params=params)
         except Exception as e:
             print(e)
             return None
 
     def place_trigger_limit_order(self, symbol: str, side: str, amount: float, trigger_price: float, price: float, reduce: bool = False) -> Optional[Dict[str, Any]]:
         try:
+            market = self.session.market(symbol)
             amount = self.amount_to_precision(symbol, amount)
             trigger_price = self.price_to_precision(symbol, trigger_price)
             price = self.price_to_precision(symbol, price)
             params = {'reduceOnly': reduce, 'triggerPrice': trigger_price}
-            return self.session.create_order(symbol, 'limit', side, amount, price, params=params)
+            return self.session.create_order(market['id'], 'limit', side, amount, price, params=params)
         except Exception as e:
             print(e)
             return None
