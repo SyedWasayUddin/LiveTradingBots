@@ -16,10 +16,12 @@ class BitgetFutures:
             "password": api_setup.get("password"),
             "enableRateLimit": True,
             "options": {
-                "defaultType": "swap",
+                "defaultType": "swap",  # ✅ Important
                 "test": True
             }
         })
+
+        self.session.set_sandbox_mode(True)  # ✅ Required for demo environment
 
         print("✅ CCXT Bitget configured for DEMO environment.")
         print(f"🔗 API Type: {self.session.options.get('defaultType')}")
@@ -45,7 +47,7 @@ class BitgetFutures:
         return self.session.fetch_order(id, symbol)
 
     def fetch_open_orders(self, symbol: str) -> List[Dict[str, Any]]:
-        return self.session.fetch_open_orders(symbol, params={"productType": "SUSDT-FUTURES"})
+        return self.session.fetch_open_orders(symbol)
 
     def fetch_open_trigger_orders(self, symbol: str) -> List[Dict[str, Any]]:
         return self.session.fetch_open_orders(symbol, params={"stop": True})
@@ -60,35 +62,23 @@ class BitgetFutures:
         return self.session.cancel_order(id, symbol, params={"stop": True})
 
     def fetch_open_positions(self, symbol: str) -> List[Dict[str, Any]]:
-        positions = self.session.fetch_positions([symbol], params={
-            'productType': 'SUSDT-FUTURES',
-            'marginCoin': 'SUSDT'
-        })
+        positions = self.session.fetch_positions([symbol])
         return [pos for pos in positions if float(pos.get('contracts', 0)) > 0]
 
     def flash_close_position(self, symbol: str, side: Optional[str] = None) -> Dict[str, Any]:
         return self.session.close_position(symbol, side=side)
 
     def set_margin_mode(self, symbol: str, margin_mode: str = 'isolated') -> None:
-        self.session.set_margin_mode(
-            margin_mode,
-            symbol,
-            params={'productType': 'SUSDT-FUTURES', 'marginCoin': 'SUSDT'},
-        )
+        self.session.set_margin_mode(margin_mode, symbol)
 
     def set_leverage(self, symbol: str, margin_mode: str = 'isolated', leverage: int = 1) -> None:
         if margin_mode == 'isolated':
             for side in ['long', 'short']:
                 self.session.set_leverage(leverage, symbol, params={
-                    'productType': 'SUSDT-FUTURES',
-                    'marginCoin': 'SUSDT',
                     'holdSide': side,
                 })
         else:
-            self.session.set_leverage(leverage, symbol, params={
-                'productType': 'SUSDT-FUTURES',
-                'marginCoin': 'SUSDT'
-            })
+            self.session.set_leverage(leverage, symbol)
 
     def fetch_recent_ohlcv(self, symbol: str, timeframe: str, limit: int = 1000) -> pd.DataFrame:
         bitget_fetch_limit = 200

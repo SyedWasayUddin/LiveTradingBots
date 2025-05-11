@@ -11,7 +11,7 @@ from utilities.bitget_futures_demo import BitgetFutures
 
 # --- CONFIG ---
 params = {
-    'symbol': 'SBTCSUSDT',
+    'symbol': 'SXRP/SUSDT',
     'timeframe': '1h',
     'margin_mode': 'isolated',  # 'cross'
     'balance_fraction': 1,
