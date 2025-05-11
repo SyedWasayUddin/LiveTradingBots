@@ -4,13 +4,11 @@ import time
 import pandas as pd
 from typing import Any, Optional, Dict, List
 
-
 class BitgetFutures:
     def __init__(self, api_setup: Optional[Dict[str, Any]] = None) -> None:
         if api_setup is None:
             api_setup = {}
 
-        # ✅ Inject these options directly (overriding everything)
         self.session = ccxt.bitget({
             "apiKey": api_setup.get("apiKey"),
             "secret": api_setup.get("secret"),
@@ -18,14 +16,11 @@ class BitgetFutures:
             "enableRateLimit": True,
             "options": {
                 "defaultType": "swap",
-                "test": True  # ✅ This enables demo environment
+                "test": True  # ✅ Enables demo mode
             }
         })
 
-        # Optional: print to confirm test mode is activated
         print("✅ CCXT Bitget configured for DEMO environment.")
-        print(f"🔗 API Base URL being used: {self.session.urls['api']}")
-
         self.markets = self.session.load_markets()
 
     def fetch_ticker(self, symbol: str) -> Dict[str, Any]:
@@ -47,24 +42,24 @@ class BitgetFutures:
         return self.session.fetch_order(id, symbol)
 
     def fetch_open_orders(self, symbol: str) -> List[Dict[str, Any]]:
-        return self.session.fetch_open_orders(symbol)
+        return self.session.fetch_open_orders(symbol, params={'productType': 'SUSDT-FUTURES'})
 
     def fetch_open_trigger_orders(self, symbol: str) -> List[Dict[str, Any]]:
-        return self.session.fetch_open_orders(symbol, params={'stop': True})
+        return self.session.fetch_open_orders(symbol, params={'stop': True, 'productType': 'SUSDT-FUTURES'})
 
     def fetch_closed_trigger_orders(self, symbol: str) -> List[Dict[str, Any]]:
-        return self.session.fetch_closed_orders(symbol, params={'stop': True})
+        return self.session.fetch_closed_orders(symbol, params={'stop': True, 'productType': 'SUSDT-FUTURES'})
 
     def cancel_order(self, id: str, symbol: str) -> Dict[str, Any]:
-        return self.session.cancel_order(id, symbol)
+        return self.session.cancel_order(id, symbol, params={'productType': 'SUSDT-FUTURES'})
 
     def cancel_trigger_order(self, id: str, symbol: str) -> Dict[str, Any]:
-        return self.session.cancel_order(id, symbol, params={'stop': True})
+        return self.session.cancel_order(id, symbol, params={'stop': True, 'productType': 'SUSDT-FUTURES'})
 
     def fetch_open_positions(self, symbol: str) -> List[Dict[str, Any]]:
         positions = self.session.fetch_positions([symbol], params={
             'productType': 'SUSDT-FUTURES',
-            'marginCoin': 'SUSDT'
+            'marginCoin': 'USDT'
         })
         return [pos for pos in positions if float(pos.get('contracts', 0)) > 0]
 
@@ -75,7 +70,7 @@ class BitgetFutures:
         self.session.set_margin_mode(
             margin_mode,
             symbol,
-            params={'productType': 'SUSDT-FUTURES', 'marginCoin': 'SUSDT'},
+            params={'productType': 'SUSDT-FUTURES', 'marginCoin': 'USDT'},
         )
 
     def set_leverage(self, symbol: str, margin_mode: str = 'isolated', leverage: int = 1) -> None:
@@ -83,13 +78,13 @@ class BitgetFutures:
             for side in ['long', 'short']:
                 self.session.set_leverage(leverage, symbol, params={
                     'productType': 'SUSDT-FUTURES',
-                    'marginCoin': 'SUSDT',
+                    'marginCoin': 'USDT',
                     'holdSide': side,
                 })
         else:
             self.session.set_leverage(leverage, symbol, params={
                 'productType': 'SUSDT-FUTURES',
-                'marginCoin': 'SUSDT'
+                'marginCoin': 'USDT'
             })
 
     def fetch_recent_ohlcv(self, symbol: str, timeframe: str, limit: int = 1000) -> pd.DataFrame:
