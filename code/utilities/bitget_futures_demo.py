@@ -24,8 +24,10 @@ class BitgetFutures:
 
         # Optional: print to confirm test mode is activated
         print("✅ CCXT Bitget configured for DEMO environment.")
+        print(f"🔗 API Base URL being used: {self.session.urls['api']}")
+
         self.markets = self.session.load_markets()
-        
+
     def fetch_ticker(self, symbol: str) -> Dict[str, Any]:
         return self.session.fetch_ticker(symbol)
 
