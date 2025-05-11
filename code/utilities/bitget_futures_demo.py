@@ -59,7 +59,7 @@ class BitgetFutures:
     def fetch_open_positions(self, symbol: str) -> List[Dict[str, Any]]:
         positions = self.session.fetch_positions([symbol], params={
             'productType': 'SUSDT-FUTURES',
-            'marginCoin': 'USDT'
+            'marginCoin': 'SUSDT'
         })
         return [pos for pos in positions if float(pos.get('contracts', 0)) > 0]
 
@@ -70,7 +70,7 @@ class BitgetFutures:
         self.session.set_margin_mode(
             margin_mode,
             symbol,
-            params={'productType': 'SUSDT-FUTURES', 'marginCoin': 'USDT'},
+            params={'productType': 'SUSDT-FUTURES', 'marginCoin': 'SUSDT'},
         )
 
     def set_leverage(self, symbol: str, margin_mode: str = 'isolated', leverage: int = 1) -> None:
@@ -78,13 +78,13 @@ class BitgetFutures:
             for side in ['long', 'short']:
                 self.session.set_leverage(leverage, symbol, params={
                     'productType': 'SUSDT-FUTURES',
-                    'marginCoin': 'USDT',
+                    'marginCoin': 'SUSDT',
                     'holdSide': side,
                 })
         else:
             self.session.set_leverage(leverage, symbol, params={
                 'productType': 'SUSDT-FUTURES',
-                'marginCoin': 'USDT'
+                'marginCoin': 'SUSDT'
             })
 
     def fetch_recent_ohlcv(self, symbol: str, timeframe: str, limit: int = 1000) -> pd.DataFrame:
