@@ -48,13 +48,13 @@ class BitgetFutures:
         return self.session.fetch_order(id, symbol)
 
     def fetch_open_orders(self, symbol: str) -> List[Dict[str, Any]]:
-        return self.session.fetch_open_orders(symbol, params={"productType": "SUSDT-FUTURES"})
+        return self.session.fetch_open_orders(symbol, type='swap', params={"productType": "SUSDT-FUTURES"})
 
     def fetch_open_trigger_orders(self, symbol: str) -> List[Dict[str, Any]]:
-        return self.session.fetch_open_orders(symbol, params={'stop': True})
+        return self.session.fetch_open_orders(symbol, type='swap', params={'stop': True})
 
     def fetch_closed_trigger_orders(self, symbol: str) -> List[Dict[str, Any]]:
-        return self.session.fetch_closed_orders(symbol, params={'stop': True})
+        return self.session.fetch_closed_orders(symbol, type='swap', params={'stop': True})
 
     def cancel_order(self, id: str, symbol: str) -> Dict[str, Any]:
         return self.session.cancel_order(id, symbol)
