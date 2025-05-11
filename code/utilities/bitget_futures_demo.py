@@ -30,9 +30,16 @@ class BitgetFutures:
             "apiKey": api_setup.get("apiKey"),
             "secret": api_setup.get("secret"),
             "password": api_setup.get("password"),
+            "enableRateLimit": True,
             "options": api_setup.get("options"),
-            "urls": api_setup.get("urls"),
-            "enableRateLimit": True
+
+            # ✅ Correct way to override environment (sandbox)
+            "urls": {
+                "api": {
+                    "public": "https://demo.bitget.com/api",
+                    "private": "https://demo.bitget.com/api"
+                }
+            }
         })
         
         self.markets = self.session.load_markets()
