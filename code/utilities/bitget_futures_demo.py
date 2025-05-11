@@ -20,7 +20,13 @@ class BitgetFutures:
             "secret": api_setup.get("secret"),
             "password": api_setup.get("password"),
             "options": api_setup["options"],
-            "enableRateLimit": True
+            "enableRateLimit": True,
+            "urls": {
+                "api": {
+                    "public": "https://demo.bitget.com/api",
+                    "private": "https://demo.bitget.com/api"
+                }
+            }
         })
 
         self.markets = self.session.load_markets()
