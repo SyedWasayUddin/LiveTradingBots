@@ -1,2 +1,2 @@
 source LiveTradingBots/code/.venv/bin/activate
-python3 LiveTradingBots/code/strategies/bitunix_bot_template/run.py
+python3 LiveTradingBots/code/strategies/envelope/run_btc.py
