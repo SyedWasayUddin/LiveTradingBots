@@ -1,3 +1,4 @@
+import json
 import ccxt
 import time
 import pandas as pd
@@ -9,26 +10,31 @@ class BitgetFutures:
         if api_setup is None:
             api_setup = {}
 
-        # ✅ Use swap for USDT-M Futures
-        api_setup.setdefault("options", {
-            "defaultType": "swap"
-        })
+        # ✅ Ensure swap type is used for USDT-M Futures
+        api_setup.setdefault("options", {"defaultType": "swap"})
 
-        # ✅ Initialize Bitget session correctly
+        # ✅ Explicit demo environment URL (optional if you're using live API)
+        api_setup["urls"] = {
+            "api": {
+                "public": "https://demo.bitget.com/api",
+                "private": "https://demo.bitget.com/api"
+            }
+        }
+
+        # ✅ Print setup to confirm
+        print("\n🔍 Final api_setup config passed to ccxt.bitget:\n")
+        print(json.dumps(api_setup, indent=4))  # ← Add this
+
+        # ✅ Initialize session
         self.session = ccxt.bitget({
             "apiKey": api_setup.get("apiKey"),
             "secret": api_setup.get("secret"),
             "password": api_setup.get("password"),
-            "options": api_setup["options"],
-            "enableRateLimit": True,
-            "urls": {
-                "api": {
-                    "public": "https://demo.bitget.com/api",
-                    "private": "https://demo.bitget.com/api"
-                }
-            }
+            "options": api_setup.get("options"),
+            "urls": api_setup.get("urls"),
+            "enableRateLimit": True
         })
-
+        
         self.markets = self.session.load_markets()
 
     def fetch_ticker(self, symbol: str) -> Dict[str, Any]:
