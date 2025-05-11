@@ -10,7 +10,7 @@ class BitgetFutures():
         if api_setup == None:
             self.session = ccxt.bitget()
         else:
-            api_setup.setdefault("options", {"defaultType": "future"})
+            api_setup.setdefault("options", {"defaultType": "swap"})
             self.session = ccxt.bitget(api_setup)
 
         self.markets = self.session.load_markets()
