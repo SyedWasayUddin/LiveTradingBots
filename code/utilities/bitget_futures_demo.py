@@ -49,12 +49,12 @@ class BitgetFutures:
         market = self.session.market(symbol)
         return self.session.fetch_order(id, market['id'])
 
-
     def fetch_open_orders(self, symbol: str) -> List[Dict[str, Any]]:
         market = self.session.market(symbol)
+        product_type = market['info'].get('productType', 'umcbl')
         return self.session.private_mix_get_v2_mix_order_orders_pending({
             'symbol': market['id'],
-            'productType': market['info']['productType']  # usually 'umcbl' for USDT-M Perps
+            'productType': product_type
     })
 
     def fetch_open_trigger_orders(self, symbol: str) -> List[Dict[str, Any]]:
