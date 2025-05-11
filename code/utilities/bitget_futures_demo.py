@@ -20,6 +20,12 @@ class BitgetFutures:
                 "test": True
             }
         })
+        
+        # Manually override API base URL to point to the demo environment
+        self.session.urls['api'] = {
+            'public': 'https://api-demo.bitget.com',
+            'private': 'https://api-demo.bitget.com',
+        }
 
         # ✅ Ensure CCXT routes to Bitget's sandbox environment
         self.session.set_sandbox_mode(True)
