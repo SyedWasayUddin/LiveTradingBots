@@ -6,14 +6,21 @@ from typing import Any, Optional, Dict, List
 
 class BitgetFutures():
     def __init__(self, api_setup: Optional[Dict[str, Any]] = None) -> None:
+        if api_setup is None:
+            api_setup = {}
 
-        if api_setup == None:
-            self.session = ccxt.bitget()
-        else:
-            api_setup.setdefault("options", {"defaultType": "future", "productType": "SUSDT-FUTURES"})
-            self.session = ccxt.bitget(api_setup)
-            self.session.set_sandbox_mode(True)
+        # Add required options
+        api_setup.setdefault("options", {"defaultType": "future"})
 
+        # 🔧 Point to demo (testnet) URL
+        api_setup["urls"] = {
+            "api": {
+                "public": "https://api.bitgetapi.com/demo",
+                "private": "https://api.bitgetapi.com/demo",
+            }
+        }
+
+        self.session = ccxt.bitget(api_setup)
         self.markets = self.session.load_markets()
   
     def fetch_ticker(self, symbol: str) -> Dict[str, Any]:
