@@ -48,12 +48,13 @@ class BitgetFutures:
         market = self.session.market(symbol)
         return self.session.fetch_order(id, market['id'])
 
+
     def fetch_open_orders(self, symbol: str) -> List[Dict[str, Any]]:
-        # Hardcoded valid demo market symbol ID
+        market = self.session.market(symbol)
         return self.session.private_mix_get_v2_mix_order_orders_pending({
-            'symbol': 'SBTCSUSDT_UMCBL',  # ✅ Bitget demo symbol ID
-            'productType': 'umcbl'        # ✅ Required for demo swap markets
-        })
+            'symbol': market['id'],
+            'productType': market['info']['productType']  # usually 'umcbl' for USDT-M Perps
+    })
 
     def fetch_open_trigger_orders(self, symbol: str) -> List[Dict[str, Any]]:
         market = self.session.market(symbol)
