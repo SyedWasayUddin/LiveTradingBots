@@ -10,22 +10,7 @@ class BitgetFutures:
         if api_setup is None:
             api_setup = {}
 
-        # ✅ Ensure swap type is used for USDT-M Futures
-        api_setup.setdefault("options", {"defaultType": "swap"})
-
-        # ✅ Explicit demo environment URL (optional if you're using live API)
-        api_setup["urls"] = {
-            "api": {
-                "public": "https://demo.bitget.com/api",
-                "private": "https://demo.bitget.com/api"
-            }
-        }
-
-        # ✅ Print setup to confirm
-        print("\n🔍 Final api_setup config passed to ccxt.bitget:\n")
-        print(json.dumps(api_setup, indent=4))  # ← Add this
-
-        # ✅ Initialize session
+        # ✅ Inject these options directly (overriding everything)
         self.session = ccxt.bitget({
             "apiKey": api_setup.get("apiKey"),
             "secret": api_setup.get("secret"),
@@ -33,12 +18,14 @@ class BitgetFutures:
             "enableRateLimit": True,
             "options": {
                 "defaultType": "swap",
-                "test": True  # ✅ THIS IS THE KEY
+                "test": True  # ✅ This enables demo environment
             }
         })
-        
-        self.markets = self.session.load_markets()
 
+        # Optional: print to confirm test mode is activated
+        print("✅ CCXT Bitget configured for DEMO environment.")
+        self.markets = self.session.load_markets()
+        
     def fetch_ticker(self, symbol: str) -> Dict[str, Any]:
         return self.session.fetch_ticker(symbol)
 
