@@ -31,14 +31,9 @@ class BitgetFutures:
             "secret": api_setup.get("secret"),
             "password": api_setup.get("password"),
             "enableRateLimit": True,
-            "options": api_setup.get("options"),
-
-            # ✅ Correct way to override environment (sandbox)
-            "urls": {
-                "api": {
-                    "public": "https://demo.bitget.com/api",
-                    "private": "https://demo.bitget.com/api"
-                }
+            "options": {
+                "defaultType": "swap",
+                "test": True  # ✅ THIS IS THE KEY
             }
         })
         
